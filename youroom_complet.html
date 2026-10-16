@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>YouRoom</title>
+<meta name="description" content="Check in with your mood, breathe, journal, track your progress and learn. Free tools for self reflection and mental wellbeing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Structure: Hero (video) > Today (check in) > Calm (breathing + grounding) > Reflect > Progress (charts) > Learn (articles + self-check) > About. */
+:root{
+--bg:#f3f6fb;--surface:#ffffff;--surface2:#e9eff8;--ink:#13233a;--muted:#52627a;--line:#d8e1ee;
+--accent:#2c52e8;--accent-ink:#ffffff;--accent-t:#e2e8ff;
+--teal:#0a8379;--teal-t:#d6f2ee;--sun:#8a5a00;--sun-t:#ffefc7;--violet:#5f43d6;--violet-t:#e8e2ff;--coral:#cc3e2b;--coral-t:#ffe2db;
+--alert:#c0321f;--alert-ink:#ffffff;
+--b-teal:#1fcbb4;--b-sun:#ffc23d;--b-violet:#9b84ff;--b-coral:#ff7a66;--b-blue:#4f7bff;
+--shadow:0 1px 2px rgba(19,35,58,.06),0 10px 28px rgba(19,35,58,.08);
+--display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+--sans:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+--bg:#0c1426;--surface:#141f36;--surface2:#1b2947;--ink:#e8eefb;--muted:#9fb0cc;--line:#27375a;
+--accent:#8fa8ff;--accent-ink:#0b1430;--accent-t:#1b2a5c;
+--teal:#4fd9c6;--teal-t:#0f3238;--sun:#ffd072;--sun-t:#3a2c0e;--violet:#b7a4ff;--violet-t:#2a2257;--coral:#ff9d8c;--coral-t:#3c1f1d;
+--alert:#ff9d8c;--alert-ink:#2b0f0a;--shadow:0 10px 28px rgba(0,0,0,.35);color-scheme:dark}}
+:root[data-theme="dark"]{
+--bg:#0c1426;--surface:#141f36;--surface2:#1b2947;--ink:#e8eefb;--muted:#9fb0cc;--line:#27375a;
+--accent:#8fa8ff;--accent-ink:#0b1430;--accent-t:#1b2a5c;
+--teal:#4fd9c6;--teal-t:#0f3238;--sun:#ffd072;--sun-t:#3a2c0e;--violet:#b7a4ff;--violet-t:#2a2257;--coral:#ff9d8c;--coral-t:#3c1f1d;
+--alert:#ff9d8c;--alert-ink:#2b0f0a;--shadow:0 10px 28px rgba(0,0,0,.35);color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.65 var(--sans)}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.02em;text-wrap:balance}
+h1{font-size:clamp(2.4rem,6vw,4.1rem);line-height:1.02;font-weight:800;letter-spacing:-.035em}
+h2{font-size:clamp(1.8rem,4vw,2.5rem);line-height:1.1;font-weight:700}
+h3{font-size:1.25rem;line-height:1.25;font-weight:700}
+p{margin:0;max-width:66ch}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.stack{display:flex;flex-direction:column;gap:1rem}
+.row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+.note{color:var(--muted);font-size:.95rem}
+.lead{font-size:1.2rem;color:var(--muted)}
+.split,.calm-grid{display:grid;gap:1.25rem;align-items:start}
+.split{grid-template-columns:repeat(2,minmax(0,1fr))}
+.calm-grid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1.25rem;align-items:start}
+.scroll{overflow-x:auto}
+
+.skip{position:absolute;left:-999px;top:0;background:var(--ink);color:var(--bg);padding:.6rem 1rem;z-index:50}
+.skip:focus{left:8px;top:8px}
+.notice{background:var(--ink);color:var(--bg);font-size:.88rem}
+.notice .wrap{padding-block:.5rem}
+.notice p{max-width:none}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem 1rem;padding-block:.55rem}
+.brand{display:flex;align-items:center;gap:.55rem;margin-right:auto;font:800 1.5rem var(--display);letter-spacing:-.03em;text-decoration:none;color:var(--ink)}
+.brand .r{color:var(--accent)}
+.mark{width:26px;height:26px;border-radius:50%;background:conic-gradient(from 200deg,var(--b-blue),var(--b-teal),var(--b-sun),var(--b-coral),var(--b-violet),var(--b-blue))}
+.links{display:flex;gap:.2rem;list-style:none;margin:0;padding:0;overflow-x:auto;order:3;width:100%}
+.links a{display:block;padding:.4rem .85rem;border-radius:999px;text-decoration:none;color:var(--muted);font-weight:600;font-size:.95rem;white-space:nowrap}
+.links a:hover{color:var(--ink);background:var(--surface2)}
+.links a[aria-current="true"]{background:var(--ink);color:var(--bg)}
+@media (min-width:900px){.links{order:0;width:auto;overflow:visible}}
+
+button,.btn{font:600 1rem var(--sans);cursor:pointer;border-radius:999px;border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:.5rem 1.25rem;min-height:44px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;transition:transform .15s,box-shadow .15s}
+button:hover,.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+button:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+.ghost{background:transparent;color:var(--accent)}
+.small{min-height:36px;padding:.25rem .9rem;font-size:.9rem}
+.danger{background:var(--alert);border-color:var(--alert);color:var(--alert-ink)}
+.ghost.danger{background:transparent;color:var(--alert)}
+.seg{display:flex;gap:.5rem;flex-wrap:wrap}
+.seg button{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.seg button[aria-pressed="true"],.seg button[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+textarea,input[type=text],input[type=search],select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:.65rem .85rem}
+textarea{min-height:110px;resize:vertical}
+select:disabled{opacity:.5}
+label{display:block;font-weight:600;margin:.9rem 0 .3rem}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.val{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+fieldset{border:0;padding:0;margin:0 0 .5rem;min-width:0}
+legend{font:700 1.1rem var(--display);padding:0}
+progress{width:100%;height:10px;accent-color:var(--accent)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:1.5rem;box-shadow:var(--shadow);min-width:0;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px)}
+.out{padding:1rem 1.1rem;background:var(--accent-t);border-radius:16px}
+.out p+p,.out p+button{margin-top:.6rem}
+.eyebrow{display:flex;align-items:center;gap:.5rem;font:700 .78rem var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.eyebrow i{width:10px;height:10px;border-radius:50%;background:var(--c,var(--accent))}
+.room{padding-block:4rem;scroll-margin-top:6rem}
+.room-head{display:flex;flex-direction:column;gap:.7rem;margin-bottom:2rem}
+.room-head h2::after{content:"";display:block;width:56px;height:5px;border-radius:9px;margin-top:.7rem;background:var(--c2,var(--b-blue))}
+.band-teal{background:var(--teal-t)}
+.band-blue{background:var(--accent-t)}
+.tag{display:inline-block;font:700 .7rem var(--sans);letter-spacing:.1em;text-transform:uppercase;padding:.1rem .55rem;border-radius:99px;margin-bottom:.3rem}
+.t-mind{background:var(--violet-t);color:var(--violet)}
+.t-body{background:var(--teal-t);color:var(--teal)}
+.t-people{background:var(--coral-t);color:var(--coral)}
+.pill{display:inline-block;font:700 .8rem var(--sans);padding:.15rem .7rem;border-radius:99px;background:var(--sun-t);color:var(--sun)}
+.sub{margin-top:3.5rem;padding-top:2.5rem;border-top:1px solid var(--line);scroll-margin-top:6rem}
+
+/* Hero with video */
+.hero{position:relative;overflow:hidden;padding-block:3rem 4rem;background:
+radial-gradient(60% 70% at 85% 10%,color-mix(in srgb,var(--b-violet) 28%,transparent),transparent 70%),
+radial-gradient(50% 60% at 5% 90%,color-mix(in srgb,var(--b-teal) 24%,transparent),transparent 70%),
+radial-gradient(40% 50% at 50% 0%,color-mix(in srgb,var(--b-sun) 20%,transparent),transparent 70%)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:3rem;align-items:center}
+.hero-copy{display:flex;flex-direction:column;gap:1.3rem}
+.hero-copy .lead{max-width:34rem}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--b-blue),var(--b-teal) 55%,var(--b-coral));-webkit-background-clip:text;background-clip:text;color:transparent}
+.vid{margin:0;display:flex;flex-direction:column;gap:.8rem}
+.vid-frame{position:relative;border-radius:30px;overflow:hidden;background:var(--ink);box-shadow:14px 14px 0 var(--b-teal),var(--shadow);border:3px solid var(--ink);aspect-ratio:4/5;max-height:72vh;width:100%}
+.vid-frame video{width:100%;height:100%;object-fit:cover;display:block;background:var(--ink)}
+.vid-fallback{position:absolute;inset:0;display:grid;place-items:center;padding:2rem;text-align:center;color:#fff;font:800 clamp(1.5rem,3.2vw,2.2rem)/1.15 var(--display);background:conic-gradient(from 190deg,var(--b-blue),var(--b-teal),var(--b-sun),var(--b-coral),var(--b-violet),var(--b-blue))}
+.vid-fallback span{background:rgba(19,35,58,.55);padding:1rem 1.3rem;border-radius:20px}
+.vid details{padding:.6rem 1rem;border-radius:14px}
+.vid summary{font:600 .95rem var(--sans)}
+.starts{margin-top:-2rem;position:relative;z-index:2}
+.starts .paths{margin:0}
+.stats{display:flex;gap:.7rem;flex-wrap:wrap}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:.6rem 1rem;min-width:7.5rem}
+.stat b{display:block;font:800 1.7rem var(--display);line-height:1.15;font-variant-numeric:tabular-nums}
+.stat span{font-size:.8rem;color:var(--muted)}
+.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:.9rem;margin-top:.5rem}
+.path{display:flex;flex-direction:column;gap:.25rem;padding:1.1rem 1.2rem;border-radius:20px;background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--c);text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s}
+.path:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.path b{font:700 1.15rem var(--display)}
+.path span{font-size:.92rem;color:var(--muted);line-height:1.4}
+
+/* Breathing orb (Calm only) */
+.orb{position:relative;width:min(240px,68vw);max-width:100%;aspect-ratio:1;display:grid;place-items:center;margin-block:.8rem}
+.halo{position:absolute;inset:-9%;border-radius:50%;border:2px dashed var(--ink);opacity:.25;animation:spin 50s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.core{position:absolute;inset:0;border-radius:50%;transform:scale(.62);transition:transform 4s ease-in-out;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.75),rgba(255,255,255,0) 42%),conic-gradient(from 190deg,var(--b-blue),var(--b-teal),var(--b-sun),var(--b-coral),var(--b-violet),var(--b-blue));box-shadow:0 20px 60px rgba(79,123,255,.35)}
+.orb-text{position:relative;max-width:82%;text-align:center;background:var(--surface);color:var(--ink);padding:.4rem 1rem;border-radius:999px;font:700 1rem var(--display);box-shadow:var(--shadow)}
+.timer{font:700 1.5rem var(--display);min-height:2.2rem;text-align:center;font-variant-numeric:tabular-nums}
+
+/* Check in */
+.moods{display:grid;grid-template-columns:repeat(auto-fit,minmax(4.1rem,1fr));gap:.6rem;margin:1rem 0}
+.moods button{flex-direction:column;gap:.3rem;border-radius:20px;background:var(--surface2);color:var(--ink);border:2px solid transparent;padding:.75rem .2rem;font-size:2rem;line-height:1;min-height:5.2rem}
+.moods button i{font-style:normal;display:block}
+.moods small{font:600 .72rem var(--sans);color:var(--muted)}
+.moods button[aria-pressed="true"]{background:var(--surface);border-color:var(--mc);box-shadow:0 0 0 4px var(--mc)}
+.moods button[aria-pressed="true"] i{animation:pop .45s ease}
+@keyframes pop{40%{transform:scale(1.35) rotate(-6deg)}}
+.sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:1rem;margin:1rem 0}
+.sliders label{display:flex;justify-content:space-between;margin:0 0 .2rem}
+.r-stress{accent-color:var(--coral)}.r-energy{accent-color:var(--teal)}.r-sleep{accent-color:var(--violet)}
+.quote{font:700 1.35rem/1.3 var(--display);letter-spacing:-.01em}
+
+.flash{animation:flash 1.4s ease}
+@keyframes flash{0%,60%{box-shadow:0 0 0 6px var(--b-teal)}100%{box-shadow:var(--shadow)}}
+.dots{display:flex;gap:.45rem}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--surface2);border:2px solid var(--line);transition:background .2s,transform .2s}
+.dots i.on{background:var(--teal);border-color:var(--teal);transform:scale(1.15)}
+.gstep{font:600 1.1rem/1.4 var(--display);min-height:3.2rem;display:flex;align-items:center}
+
+.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.7rem}
+.hist li{border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;background:var(--bg);display:flex;flex-direction:column;gap:.35rem;align-items:flex-start}
+.hist p{max-width:none;overflow-wrap:anywhere}
+.wc{font-variant-numeric:tabular-nums}
+
+svg.chart{width:100%;height:auto;max-height:230px;display:block}
+.gl{stroke:var(--line);stroke-width:1}
+.tx{fill:var(--muted);font-size:10px;font-family:var(--sans)}
+.k-violet{--k:var(--violet)}.k-coral{--k:var(--coral)}.k-teal{--k:var(--teal)}.k-blue{--k:var(--accent)}
+.ln{fill:none;stroke:var(--k);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.dash{stroke-dasharray:6 5}
+.dot{fill:var(--k)}
+.halo-dot{fill:var(--k);opacity:.25}
+.bar-m{fill:var(--k)}
+.area{fill:var(--k);opacity:.14}
+.band{fill:var(--teal);opacity:.16}
+.legend{font-size:.85rem;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:.97rem}
+caption{text-align:left;font-weight:700;padding-bottom:.5rem}
+th,td{text-align:left;padding:.45rem .5rem;border-bottom:1px solid var(--line)}
+.opts{display:flex;flex-direction:column;gap:.5rem}
+.opts label{font-weight:500;margin:0;display:flex;gap:.7rem;align-items:center;border:2px solid var(--line);border-radius:14px;padding:.65rem 1rem;cursor:pointer}
+.opts label:hover{border-color:var(--accent)}
+.opts label:has(input:checked){border-color:var(--accent);background:var(--accent-t)}
+.opts input{accent-color:var(--accent);width:1.1rem;height:1.1rem}
+.meter{height:12px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.meter i{display:block;height:100%;border-radius:99px}
+
+.learn-bar{display:flex;gap:.8rem 1rem;flex-wrap:wrap;align-items:center;margin-bottom:1.5rem}
+.learn-bar input{max-width:320px}
+.articles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:.8rem;align-items:start}
+details{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1rem 1.2rem}
+summary{cursor:pointer;font:700 1.08rem var(--display);display:flex;justify-content:space-between;align-items:center;gap:1rem;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:700 1.5rem var(--sans);color:var(--accent);line-height:1}
+details[open] summary::after{content:"\2212"}
+details p{margin-top:.7rem}
+
+footer{border-top:1px solid var(--line);padding-block:2rem 3rem;color:var(--muted);font-size:.95rem}
+.foot{display:flex;flex-wrap:wrap;gap:1rem 2rem;justify-content:space-between;align-items:center}
+.foot ul{display:flex;gap:1.2rem;flex-wrap:wrap;list-style:none;margin:0;padding:0}
+.foot a{color:var(--muted);text-decoration:none;font-weight:600}
+.foot a:hover{color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:.65rem 1.2rem;border-radius:999px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:40;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:900px){.split,.calm-grid{grid-template-columns:minmax(0,1fr)}.room{padding-block:3rem}.hero-grid{grid-template-columns:minmax(0,1fr);gap:2rem}.vid-frame{aspect-ratio:3/4;max-height:68vh;box-shadow:8px 8px 0 var(--b-teal),var(--shadow)}.starts{margin-top:-1rem}}
+@media (max-width:480px){.card{padding:1.1rem;border-radius:18px}.stat{min-width:6.5rem}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#today">Skip to content</a>
+<div class="notice"><div class="wrap"><p>YouRoom offers education and self reflection. </p></div></div>
+
+<header class="top"><div class="wrap"><nav class="bar" aria-label="Main">
+<a class="brand" href="#top" aria-label="YouRoom home"><span class="mark" aria-hidden="true"></span><span>You<span class="r">Room</span></span></a>
+<ul class="links">
+<li><a href="#today">Today</a></li><li><a href="#calm">Calm</a></li><li><a href="#reflect">Reflect</a></li><li><a href="#progress">Progress</a></li><li><a href="#learn">Learn</a></li>
+</ul>
+<button class="ghost small" id="theme" type="button">Dark mode</button>
+</nav></div></header>
+
+<main id="top">
+
+<section class="hero"><div class="wrap hero-grid">
+<div class="hero-copy">
+<p class="eyebrow" style="--c:var(--b-coral)"><i></i><span id="greet">Welcome</span></p>
+<h1>You don't have to have it all <em>figured out.</em></h1>
+<p class="lead">YouRoom is here for you. Notice how you feel, slow your breathing, write things down and learn simple ways to look after your mind. Everything stays on your device.</p>
+<div class="row"><a class="btn" href="#today">Start a check in</a><a class="btn ghost" href="#calm">Take a breath</a></div>
+</div>
+<figure class="vid">
+<div class="vid-frame">
+<video id="heroVid" controls playsinline preload="metadata" aria-label="A message from YouRoom"><source src="Woman_speaking_reassuring_message_20261015141457.mp4" type="video/mp4"><source src="woman.mp4" type="video/mp4"><source src="woman.webm" type="video/webm"></video>
+<div class="vid-fallback" id="vidFb" hidden><span>You don't have to have it all figured out.<br>YouRoom is here for you.</span></div>
+</div>
+<figcaption><details><summary>Read the message</summary><p style="margin-top:.5rem">You don't have to have it all figured out. YouRoom is here for you.</p></details></figcaption>
+</figure>
+</div></section>
+
+<section class="starts"><div class="wrap">
+<nav class="paths" aria-label="Where to start">
+<a class="path" href="#today" style="--c:var(--b-sun)"><b>Check in</b><span>Mood, stress, energy and sleep in one minute.</span></a>
+<a class="path" href="#calm" style="--c:var(--b-teal)"><b>Calm down</b><span>Guided breathing, muscle relaxation, grounding.</span></a>
+<a class="path" href="#reflect" style="--c:var(--b-violet)"><b>Write</b><span>Test a hard thought or journal freely.</span></a>
+<a class="path" href="#progress" style="--c:var(--b-blue)"><b>See patterns</b><span>Charts and a weekly summary.</span></a>
+</nav>
+</div></section>
+
+<!-- Today -->
+<section class="room" id="today"><div class="wrap">
+<div class="room-head" style="--c2:var(--b-sun)">
+<p class="eyebrow" style="--c:var(--b-sun)"><i></i>Today</p>
+<h2>How are you feeling right now?</h2>
+<p class="lead">Pick the mood that fits best, then set three sliders. There is no right answer.</p>
+<div class="stats" aria-label="Your activity">
+<div class="stat"><b id="stStreak">0</b><span>day streak</span></div>
+<div class="stat"><b id="stWeek">0</b><span>check ins this week</span></div>
+<div class="stat"><b id="stMood">–</b><span>average mood</span></div>
+</div>
+</div>
+<div class="split">
+<div class="card">
+<div class="moods" id="moods" role="group" aria-label="Mood"></div>
+<div class="out" id="moodOut" hidden></div>
+<div class="sliders">
+<div><label for="sStress">Stress <span class="val" id="vStress"></span></label><input class="r-stress" type="range" id="sStress" min="0" max="10" step="1" value="4"></div>
+<div><label for="sEnergy">Energy <span class="val" id="vEnergy"></span></label><input class="r-energy" type="range" id="sEnergy" min="0" max="10" step="1" value="5"></div>
+<div><label for="sSleep">Sleep last night <span class="val" id="vSleep"></span></label><input class="r-sleep" type="range" id="sSleep" min="0" max="12" step="0.5" value="7"></div>
+</div>
+<div class="row"><button id="saveCI" type="button">Save check in and get a suggestion</button></div>
+<p class="note" id="ciMsg" role="status" style="margin-top:.7rem"></p>
+<div class="out" id="recOut" hidden></div>
+</div>
+<div class="stack">
+<div class="card">
+<h3>One intention for today</h3>
+<p class="note" style="margin-top:.3rem">A small, concrete thing you want to do for yourself.</p>
+<label for="intent">My intention</label>
+<input type="text" id="intent" maxlength="120" placeholder="Take a 10 minute walk after lunch">
+<div class="row" style="margin-top:.8rem"><button class="small" id="saveIntent" type="button">Save intention</button></div>
+</div>
+<div class="card"><p class="eyebrow" style="--c:var(--b-teal)"><i></i>Thought for today</p><p class="quote" id="quote" style="margin-top:.6rem"></p></div>
+</div>
+</div>
+</div></section>
+
+<!-- Calm -->
+<section class="room band-teal" id="calm"><div class="wrap">
+<div class="room-head" style="--c2:var(--b-teal)">
+<p class="eyebrow" style="--c:var(--b-teal)"><i></i>Calm</p>
+<h2>Slow your body down</h2>
+<p class="lead">Choose a technique and follow the circle. If you feel dizzy, stop and breathe normally. You can skip the holds at any time.</p>
+</div>
+<div class="calm-grid">
+<div class="card stack" style="align-items:center">
+<div class="seg" id="rTech" role="group" aria-label="Technique">
+<button type="button" data-k="box" aria-pressed="true">Box 4-4-4-4</button>
+<button type="button" data-k="pmr" aria-pressed="false">Muscle relaxation</button>
+</div>
+<p class="note" id="rNote" style="text-align:center"></p>
+<div class="orb" aria-live="polite"><div class="halo" aria-hidden="true"></div><div class="core" id="rCore"></div><span class="orb-text" id="rText">Ready when you are</span></div>
+<p class="timer" id="rTime"></p>
+<div class="row" style="justify-content:center;width:100%">
+<div style="min-width:9rem"><label for="rDur" style="margin-top:0">Duration</label><select id="rDur"><option value="1">1 minute</option><option value="3" selected>3 minutes</option><option value="5">5 minutes</option></select></div>
+<button id="rBtn" type="button" style="align-self:flex-end">Start</button>
+</div>
+</div>
+<div class="card stack" id="grounding">
+<h3>Grounding: 5, 4, 3, 2, 1</h3>
+<p class="note">A quick way to come back to the present when your mind is racing.</p>
+<div class="dots" id="gDots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+<div class="out gstep" id="gStep">Press start to begin.</div>
+<div class="row"><button id="gBtn" type="button">Start</button></div>
+</div>
+</div>
+</div></section>
+
+<!-- Reflect -->
+<section class="room" id="reflect"><div class="wrap">
+<div class="room-head" style="--c2:var(--b-violet)">
+<p class="eyebrow" style="--c:var(--b-violet)"><i></i>Reflect</p>
+<h2>Write it down, then look at it again</h2>
+<p class="lead">Two ways to make sense of your day: test a hard thought, or write freely.</p>
+</div>
+<div class="seg" id="reflectTabs" role="tablist" aria-label="Reflect tools" style="margin-bottom:1.25rem">
+<button type="button" role="tab" id="tab-thoughts" data-t="thoughts" aria-selected="true" aria-controls="panel-thoughts">Thought record</button>
+<button type="button" role="tab" id="tab-journal" data-t="journal" aria-selected="false" aria-controls="panel-journal" tabindex="-1">Daily journal</button>
+</div>
+
+<div class="rpanel" id="panel-thoughts" data-t="thoughts" role="tabpanel" aria-labelledby="tab-thoughts">
+
+<div class="split">
+<div class="card">
+<form id="trForm">
+<fieldset><legend>1. Situation</legend>
+<label for="trS">What happened? Where, when, with whom?</label>
+<textarea id="trS" style="min-height:70px"></textarea></fieldset>
+<fieldset><legend>2. Automatic thought and emotion</legend>
+<label for="trT">What thought went through your mind?</label>
+<textarea id="trT" style="min-height:70px"></textarea>
+<label for="trE">Main emotion</label><select id="trE"></select>
+<label for="trI1">How intense was it? <span class="val" id="vI1"></span></label>
+<input type="range" id="trI1" min="0" max="100" step="5" value="60">
+<label for="trD">Thinking pattern (optional)</label><select id="trD"></select></fieldset>
+<fieldset><legend>3. Balanced view</legend>
+<label for="trA">What evidence is for and against the thought? What would you tell a friend?</label>
+<textarea id="trA" style="min-height:90px"></textarea>
+<label for="trI2">Intensity of the emotion now <span class="val" id="vI2"></span></label>
+<input type="range" id="trI2" min="0" max="100" step="5" value="40"></fieldset>
+<div class="row" style="margin-top:.8rem"><button type="submit">Save thought record</button></div>
+<p class="note" id="trMsg" role="status" style="margin-top:.7rem"></p>
+</form>
+</div>
+<div class="card stack"><h3>Your recent records</h3><div id="trList"></div></div>
+</div>
+</div>
+
+<div class="rpanel" id="panel-journal" data-t="journal" role="tabpanel" aria-labelledby="tab-journal" hidden>
+<div class="split">
+<div class="card">
+<h3>Daily journal</h3>
+<p id="prompt" class="quote" style="margin-top:.6rem;font-size:1.15rem"></p>
+<label for="entry">Your entry</label>
+<textarea id="entry" placeholder="Write freely. Nobody else will read this."></textarea>
+<div class="row" style="margin-top:.8rem"><button id="saveJ" type="button">Save entry</button><button class="ghost" id="newP" type="button">Another prompt</button><span class="note wc" id="wc">0 words</span></div>
+<p class="note" id="jMsg" role="status" style="margin-top:.7rem"></p>
+</div>
+<div class="card stack"><h3>Recent entries</h3><div id="jList"></div></div>
+</div>
+</div>
+</div></section>
+
+<!-- Progress: charts only -->
+<section class="room band-blue" id="progress"><div class="wrap">
+<div class="room-head" style="--c2:var(--b-blue)">
+<p class="eyebrow" style="--c:var(--b-blue)"><i></i>Progress</p>
+<h2>See your own patterns</h2>
+<p class="lead">Built from your check ins and saved only in this browser. These are simple observations, not conclusions.</p>
+</div>
+<div class="row" style="margin-bottom:1.25rem">
+<div class="seg" role="group" aria-label="Period">
+<button type="button" id="r7" aria-pressed="true">Last 7 days</button>
+<button type="button" id="r14" aria-pressed="false">Last 14 days</button>
+</div>
+<span class="pill" id="exBadge" hidden>Example data. Save a check in to see your own.</span>
+</div>
+<div class="cols">
+<div class="card"><h3>Mood</h3><div id="chartMood"></div><p class="legend">1 is low, 5 is great.</p></div>
+<div class="card"><h3>Stress and energy</h3><div id="chartSE"></div><p class="legend">Solid coral line: stress. Dashed teal line: energy. Scale 0 to 10.</p></div>
+<div class="card"><h3>Sleep</h3><div id="chartSleep"></div><p class="legend">Hours per night. The shaded band marks 7 to 9 hours, where many adults feel best.</p></div>
+<div class="card"><h3>Weekly summary</h3><div class="scroll" id="weekly"></div></div>
+</div>
+<div class="row" style="margin-top:1.25rem"><button class="ghost" id="clearMoods" type="button">Clear check in history</button></div>
+</div></section>
+
+<!-- Learn: articles + self-check -->
+<section class="room" id="learn"><div class="wrap">
+<div class="room-head" style="--c2:var(--b-coral)">
+<p class="eyebrow" style="--c:var(--b-coral)"><i></i>Learn</p>
+<h2>Short reads for a clearer head</h2>
+</div>
+<div class="learn-bar">
+<div class="seg" id="chips" role="group" aria-label="Topic">
+<button type="button" class="small" data-c="all" aria-pressed="true">All</button>
+<button type="button" class="small" data-c="mind" aria-pressed="false">Mind</button>
+<button type="button" class="small" data-c="body" aria-pressed="false">Body</button>
+<button type="button" class="small" data-c="people" aria-pressed="false">People</button>
+</div>
+<input type="search" id="q" placeholder="Search topics" aria-label="Search topics">
+</div>
+<div class="articles" id="articles">
+<details data-c="mind"><summary><span><small class="tag t-mind">Mind</small><br>Understanding stress</span></summary><p>Stress is the body's response to demands. Short bursts can help you focus, but constant stress affects sleep, mood and concentration. Helpful habits include regular breaks, movement, time outdoors and talking to someone you trust.</p></details>
+<details data-c="mind"><summary><span><small class="tag t-mind">Mind</small><br>Understanding anxiety</span></summary><p>Anxiety is a normal alarm system that sometimes fires too often. Slow breathing, naming the worry, and facing small fears step by step can reduce its grip. If worry affects daily life for weeks, speak with a professional.</p></details>
+<details data-c="body"><summary><span><small class="tag t-body">Body</small><br>Sleep and mental health</span></summary><p>Sleep and mood influence each other. Keep a steady wake up time, dim screens before bed, limit caffeine after noon and keep your bedroom cool and dark.</p></details>
+<details data-c="body"><summary><span><small class="tag t-body">Body</small><br>Moving your body</span></summary><p>You do not need a gym. A 10 minute walk, some stretching or dancing in your kitchen can lift energy and ease tension. Pick something you enjoy and keep it small enough to repeat.</p></details>
+<details data-c="mind"><summary><span><small class="tag t-mind">Mind</small><br>Burnout: early signs</span></summary><p>Common signs are constant exhaustion, cynicism about work, reduced performance and feeling detached. Rest alone is rarely enough; look at workload, boundaries and support.</p></details>
+<details data-c="mind"><summary><span><small class="tag t-mind">Mind</small><br>Building self esteem</span></summary><p>Notice your inner critic and answer it the way you would answer a friend. Keep a short list of things you handled well each week and set goals small enough to finish.</p></details>
+<details data-c="mind"><summary><span><small class="tag t-mind">Mind</small><br>Dealing with negative thoughts</span></summary><p>Thoughts are not facts. Try to spot patterns such as all or nothing thinking or catastrophizing, then test them: what is the evidence for and against this thought? The thought record in the Reflect room walks you through it.</p></details>
+<details data-c="people"><summary><span><small class="tag t-people">People</small><br>How to support a friend</span></summary><p>Listen without rushing to fix. Say what you have noticed, ask how they are really doing, and encourage professional help if things seem heavy. Check in again later.</p></details>
+<details data-c="people"><summary><span><small class="tag t-people">People</small><br>Is therapy for me?</span></summary><p>Therapy is for anyone who wants support, not only for crises. If distress lasts, affects your work, relationships or sleep, or you simply want to understand yourself better, it is worth exploring.</p></details>
+</div>
+<p class="note" id="noArt" hidden>No topics match. Try another word or choose All.</p>
+
+<div class="sub" id="quiz">
+<div class="room-head" style="margin-bottom:1.25rem">
+<p class="eyebrow" style="--c:var(--b-blue)"><i></i>Self-check</p>
+<h3 style="font-size:1.7rem">Anxiety screening (GAD-7)</h3>
+<p class="note">Seven questions about the last two weeks. The GAD-7 is a widely used screening questionnaire. </p>
+</div>
+<div class="card" id="quizBox" style="max-width:720px"></div>
+<p class="note" style="margin-top:1rem">Source: Spitzer RL, Kroenke K, Williams JBW, Löwe B. A brief measure for assessing generalized anxiety disorder: the GAD-7. Archives of Internal Medicine, 2006;166(10):1092-1097.</p>
+</div>
+</div></section>
+
+<!-- About -->
+<section class="room band-blue" id="about"><div class="wrap">
+<div class="stack" style="max-width:720px">
+<h3>About YouRoom</h3>
+<p>YouRoom is a small, free project that makes mental health education and simple coping tools easy to reach. It does not collect your data: check ins, thought records, journal entries and screening results are stored only in your browser. Clearing your browser data erases them.</p>
+<div class="row"><button class="ghost danger" id="wipe" type="button">Delete all my data on this device</button></div>
+<p class="note" id="wipeMsg" role="status"></p>
+</div>
+</div></section>
+</main>
+
+<footer><div class="wrap foot"><p>YouRoom, 2026. For education only. Not a medical service.</p>
+<ul><li><a href="#today">Today</a></li><li><a href="#calm">Calm</a></li><li><a href="#reflect">Reflect</a></li><li><a href="#progress">Progress</a></li><li><a href="#learn">Learn</a></li><li><a href="#about">About</a></li><li><a href="#top">Back to top</a></li></ul></div></footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+const pad=n=>String(n).padStart(2,'0');
+const dstr=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>dstr(new Date());
+const daysAgo=n=>{const d=new Date();d.setDate(d.getDate()-n);return dstr(d)};
+const dayLabel=d=>d.slice(8)+'/'+d.slice(5,7);
+const avg=(a,k)=>{const v=a.map(x=>x[k]).filter(x=>typeof x==='number');return v.length?v.reduce((p,c)=>p+c,0)/v.length:null};
+const fmt=(v,u)=>v==null?'-':(Math.round(v*10)/10)+(u||'');
+const mk=(tag,txt,cls)=>{const e=document.createElement(tag);if(txt!=null)e.textContent=txt;if(cls)e.className=cls;return e};
+
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+
+/* Theme */
+const root=document.documentElement;
+const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+function syncTheme(){const d=isDark();$('#theme').textContent=d?'Light mode':'Dark mode';$('#theme').setAttribute('aria-label',d?'Switch to light mode':'Switch to dark mode')}
+$('#theme').onclick=()=>{root.dataset.theme=isDark()?'light':'dark';store.set('theme',root.dataset.theme);syncTheme()};
+const savedTheme=store.get('theme',null);if(savedTheme)root.dataset.theme=savedTheme;
+syncTheme();
+
+const hr=new Date().getHours();
+$('#greet').textContent=hr<5?'Still up?':hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';
+const quotes=['Small steps still count.','You are allowed to rest.','Feelings pass, like weather.','Progress is rarely a straight line.','Be as kind to yourself as you are to others.','One breath at a time.','Asking for help is a strength.'];
+$('#quote').textContent=quotes[new Date().getDate()%quotes.length];
+
+if('IntersectionObserver' in window){
+const links=$$('.links a');
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.removeAttribute('aria-current'));const a=document.querySelector('.links a[href="#'+e.target.id+'"]');if(a)a.setAttribute('aria-current','true')}})},{rootMargin:'-45% 0px -50% 0px'});
+['today','calm','reflect','progress','learn'].forEach(id=>{const el=document.getElementById(id);if(el)io.observe(el)})}
+
+/* Hero video fallback */
+(function(){const v=$('#heroVid'),fb=$('#vidFb'),src=[...v.querySelectorAll('source')];let bad=0;
+src.forEach(x=>x.addEventListener('error',()=>{if(++bad>=src.length){v.hidden=true;fb.hidden=false}}));
+v.addEventListener('error',()=>{v.hidden=true;fb.hidden=false})})();
+
+/* Breathing (Calm room only) */
+const pmrGroups=['hands and forearms','upper arms','shoulders and neck','face','chest and back','belly','thighs','calves and feet'];
+const TECH={
+box:{note:'Four seconds in, hold, out, hold. An even rhythm that helps you feel steady.',loop:true,steps:[['Breathe in',4,1],['Hold',4,1],['Breathe out',4,0],['Hold',4,0]]},
+pmr:{note:'Tense each muscle group for 5 seconds, then release for 10. Tense gently and skip any area that hurts. One pass lasts about 2 minutes.',loop:false,steps:pmrGroups.flatMap(g=>[['Tense: '+g,5,1],['Release: '+g,10,0]])}};
+function makeBreather(core,text,time,idle){
+let iv=null;const api={onstop:null};
+api.running=()=>iv!==null;
+api.stop=done=>{if(iv)clearInterval(iv);iv=null;core.style.transitionDuration='1s';core.style.transform='scale(.62)';
+text.textContent=done?'Session complete. Notice how you feel.':idle;if(time)time.textContent='';if(api.onstop)api.onstop(done)};
+api.start=(t,sec)=>{const steps=t.steps;let rem=sec,si=0,left=0;
+const clock=()=>{if(time&&isFinite(rem))time.textContent=pad(Math.floor(rem/60))+':'+pad(rem%60)};
+const enter=()=>{const s=steps[si%steps.length];left=s[1];text.textContent=s[0];core.style.transitionDuration=s[1]+'s';core.style.transform='scale('+(s[2]?1:.62)+')'};
+enter();clock();
+iv=setInterval(()=>{rem--;left--;clock();
+if(rem<=0){api.stop(true);return}
+if(left<=0){si++;if(!t.loop&&si>=steps.length){api.stop(true);return}enter()}},1000)};
+return api}
+
+let tech='box';
+const rb=makeBreather($('#rCore'),$('#rText'),$('#rTime'),'Ready when you are');
+rb.onstop=()=>{$('#rBtn').textContent='Start'};
+function setTech(k){if(rb.running())rb.stop(false);tech=k;
+$$('#rTech button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k));
+$('#rNote').textContent=TECH[k].note;$('#rDur').disabled=!TECH[k].loop}
+$$('#rTech button').forEach(b=>b.onclick=()=>setTech(b.dataset.k));
+$('#rBtn').onclick=()=>{if(rb.running()){rb.stop(false);return}
+const t=TECH[tech];rb.start(t,t.loop?+$('#rDur').value*60:t.steps.reduce((a,s)=>a+s[1],0));$('#rBtn').textContent='Stop'};
+setTech('box');
+
+/* Grounding (Calm room) */
+const gs=['Name 5 things you can see.','Name 4 things you can touch or feel.','Name 3 things you can hear.','Name 2 things you can smell.','Name 1 thing you can taste, or one slow breath you can take.','Well done. Notice how your body feels now.'];
+(function(){let gi=-1;const stepEl=$('#gStep'),btn=$('#gBtn'),dots=[...$('#gDots').children];
+btn.onclick=()=>{gi++;
+if(gi>=gs.length){gi=-1;stepEl.textContent='Press start to begin.';btn.textContent='Start';dots.forEach(d=>d.classList.remove('on'));return}
+stepEl.textContent=gs[gi];btn.textContent=gi===gs.length-1?'Finish':'Next';
+dots.forEach((d,i)=>d.classList.toggle('on',i<=gi))}})();
+
+/* Today: check in */
+const moods=[
+['😄','Great','Wonderful. Take a moment to notice what is going well.','var(--b-sun)'],
+['🙂','Good','Glad to hear it. A short walk or a message to someone you care about can help you keep this feeling going.','var(--b-teal)'],
+['😐','Okay','Okay is fine. Let the sliders below tell a fuller story.','var(--b-blue)'],
+['😟','Low','Thank you for being honest. Be gentle with yourself today.','var(--b-violet)'],
+['😢','Struggling','I am sorry it feels heavy. You do not have to carry it alone: consider reaching out to someone you trust.','var(--b-coral)']];
+let curMood=null;
+const mbox=$('#moods');
+moods.forEach((m,i)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label',m[1]);
+b.style.setProperty('--mc',m[3]);
+b.innerHTML='<i>'+m[0]+'</i><small>'+m[1]+'</small>';
+b.onclick=()=>{[...mbox.children].forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');
+curMood=5-i;const out=$('#moodOut');out.hidden=false;out.textContent=m[2];$('#ciMsg').textContent=''};
+mbox.appendChild(b)});
+function bindRange(id,out,suffix){const i=$(id),o=$(out);const f=()=>o.textContent=i.value+(suffix||'');i.oninput=f;f()}
+bindRange('#sStress','#vStress','/10');bindRange('#sEnergy','#vEnergy','/10');bindRange('#sSleep','#vSleep',' h');
+
+/* Suggestion: driven first by how the person feels (mood), then refined by stress, energy and sleep */
+function recommend(r){
+let rec;
+if(r.m===5)
+rec={title:'Journal this moment of joy',why:'You feel great today. Write a few lines about what made it feel this way, so you can come back to it on harder days.',a:{t:'journal'},label:'Open journal'};
+else if(r.m===4)
+rec={title:'Write down what is going well',why:'You feel good. Take a minute to journal what helped you get here, and what you want to keep doing.',a:{t:'journal'},label:'Open journal'};
+else if(r.m===3){
+if(r.s>=6)rec={title:'Box breathing',why:'You feel okay, but your stress is on the higher side. An even 4-4-4-4 rhythm helps you settle before it builds up.',a:{t:'relax',k:'box'},label:'Open box breathing'};
+else if(r.h<6||r.e<=3)rec={title:'Progressive muscle relaxation',why:'You feel okay, but sleep or energy is low. Releasing muscle tension is restful and asks very little of you.',a:{t:'relax',k:'pmr'},label:'Open muscle relaxation'};
+else rec={title:'A short walk',why:'You feel okay. A few minutes of movement and daylight is an easy way to tip the day in a good direction.',a:{t:'intent',text:'Take a 10 minute walk outside'},label:'Set as my intention'}}
+else if(r.m===2)
+rec={title:'Take a break and step outside',why:'You feel low. Pause what you are doing, get some fresh air and walk for ten minutes, ideally without your phone. Daylight and movement often ease a heavy mood. If you can, send a message to someone you like.',a:{t:'intent',text:'Take a break and walk outside for 10 minutes'},label:'Set as my intention'};
+else
+rec={title:'Pause, ground yourself and reach out',why:'It feels heavy right now. Stop what you are doing and try the 5, 4, 3, 2, 1 grounding exercise. Then reach out to someone you trust, even with a short message, and get a bit of fresh air if you can.',a:{t:'ground'},label:'Open grounding'};
+if(r.h<6&&r.m>2)rec.extra='You slept under 6 hours. Tiredness can make everything feel heavier, so it is worth watching in your progress charts.';
+return rec}
+function runAction(a){
+if(a.t==='ground'){const g=$('#grounding');g.scrollIntoView({behavior:'smooth',block:'center'});g.classList.remove('flash');void g.offsetWidth;g.classList.add('flash')}
+else if(a.t==='relax'){setTech(a.k);$('#calm').scrollIntoView({behavior:'smooth'})}
+else if(a.t==='intent'){const i=$('#intent');i.value=a.text;i.scrollIntoView({behavior:'smooth',block:'center'});i.focus({preventScroll:true});toast('Added to your intention. Press Save intention to keep it.')}
+else{setTab('journal');$('#reflect').scrollIntoView({behavior:'smooth'})}}
+$('#saveCI').onclick=()=>{
+if(curMood==null){$('#ciMsg').textContent='Pick a mood first.';return}
+const r={d:today(),m:curMood,s:+$('#sStress').value,e:+$('#sEnergy').value,h:+$('#sSleep').value};
+const h=store.get('moods',[]).filter(e=>e.d!==r.d);h.push(r);
+const ok=store.set('moods',h.slice(-60));
+$('#ciMsg').textContent=ok?'Check in saved on this device.':'Could not save in this browser.';
+if(ok)toast('Check in saved');
+drawDashboard();drawStats();
+const rec=recommend(r),out=$('#recOut');out.hidden=false;out.innerHTML='';
+out.append(mk('strong','Suggested for you: '+rec.title),mk('p',rec.why));
+if(rec.extra)out.append(mk('p',rec.extra));
+const row=mk('div',null,'row');row.style.marginTop='.7rem';
+const b=mk('button',rec.label);b.type='button';b.onclick=()=>runAction(rec.a);row.append(b);
+out.append(row)};
+
+const intents=store.get('intent',{});$('#intent').value=intents[today()]||'';
+$('#saveIntent').onclick=()=>{const v=$('#intent').value.trim();const all=store.get('intent',{});
+if(!v){toast('Write your intention first');return}
+all[today()]=v;
+const keys=Object.keys(all).sort().slice(-30),keep={};keys.forEach(k=>keep[k]=all[k]);
+toast(store.set('intent',keep)?'Intention saved':'Could not save in this browser')};
+function streak(){const set=new Set(store.get('moods',[]).map(e=>e.d));let i=set.has(today())?0:1,c=0;while(set.has(daysAgo(i))){c++;i++}return c}
+function drawStats(){const all=store.get('moods',[]);$('#stStreak').textContent=streak();
+const w=all.filter(e=>e.d>=daysAgo(6));$('#stWeek').textContent=w.length;
+const a=avg(w,'m');$('#stMood').textContent=a==null?'–':moods[5-Math.min(5,Math.max(1,Math.round(a)))][0]}
+
+/* Progress */
+let range=7;
+function sample(){const m=[3,3,4,2,3,4,4,3,2,3,4,4,3,4],s=[6,5,4,8,6,4,3,5,7,5,4,3,5,3],e=[5,5,6,3,4,6,7,5,3,5,6,7,5,6],h=[6.5,7,7.5,5.5,6.5,7.5,8,7,5,6.5,7.5,8,7,7.5];
+return m.map((_,i)=>({d:daysAgo(13-i),m:m[i],s:s[i],e:e[i],h:h[i]}))}
+function plot(el,rows,keys,o){
+const W=400,H=170,pl=30,pr=12,pt=12,pb=26,iw=W-pl-pr,ih=H-pt-pb,n=rows.length;
+if(!n){el.innerHTML='<p class="note">No data in this period yet. Save a check in to start.</p>';return}
+const X=i=>pl+(n>1?i*iw/(n-1):iw/2);
+const Y=v=>pt+ih-(Math.min(Math.max(v,o.min),o.max)-o.min)/(o.max-o.min)*ih;
+let s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+o.label+'">';
+for(let v=o.min;v<=o.max;v+=o.step){const y=Y(v);s+='<line class="gl" x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y+'" y2="'+y+'"/><text class="tx" x="4" y="'+(y+4)+'">'+v+'</text>'}
+if(o.band)s+='<rect class="band" x="'+pl+'" y="'+Y(o.band[1])+'" width="'+iw+'" height="'+(Y(o.band[0])-Y(o.band[1]))+'"/>';
+rows.forEach((r,i)=>{if(n<=8||i%2===0||i===n-1)s+='<text class="tx" x="'+X(i)+'" y="'+(H-8)+'" text-anchor="middle" style="font-size:9px">'+dayLabel(r.d)+'</text>'});
+if(o.bars){const bw=Math.min(26,iw/n*.6);
+rows.forEach((r,i)=>{const y=Y(r[keys[0]]);s+='<rect class="bar-m k-'+o.cls[0]+'" x="'+(X(i)-bw/2)+'" y="'+y+'" width="'+bw+'" height="'+(pt+ih-y)+'" rx="4"/>'})}
+else keys.forEach((k,ki)=>{
+const pts=rows.map((r,i)=>r[k]==null?null:[X(i),Y(r[k])]).filter(Boolean);
+if(o.area&&ki===0&&pts.length>1)s+='<polygon class="area k-'+o.cls[ki]+'" points="'+pts.map(p=>p.join(',')).join(' ')+' '+pts[pts.length-1][0]+','+(pt+ih)+' '+pts[0][0]+','+(pt+ih)+'"/>';
+if(pts.length>1)s+='<polyline class="ln k-'+o.cls[ki]+(ki?' dash':'')+'" points="'+pts.map(p=>p.join(',')).join(' ')+'"/>';
+pts.forEach((p,pi)=>{const last=pi===pts.length-1;
+if(last)s+='<circle class="halo-dot k-'+o.cls[ki]+'" cx="'+p[0]+'" cy="'+p[1]+'" r="9"/>';
+s+='<circle class="dot k-'+o.cls[ki]+'" cx="'+p[0]+'" cy="'+p[1]+'" r="'+(last?5:3.5)+'"/>'})});
+el.innerHTML=s+'</svg>'}
+function trend(cur,prev,th){if(cur==null)return '-';if(prev==null)return 'no data last week';const d=cur-prev;return Math.abs(d)<th?'about the same':(d>0?'higher':'lower')}
+function drawDashboard(){
+const real=store.get('moods',[]);const ex=!real.length;
+const all=(ex?sample():real).slice().sort((a,b)=>a.d<b.d?-1:1);
+$('#exBadge').hidden=!ex;
+const rows=all.filter(e=>e.d>=daysAgo(range-1));
+plot($('#chartMood'),rows,['m'],{min:1,max:5,step:1,cls:['violet'],area:true,label:'Mood over time'});
+plot($('#chartSE'),rows.filter(e=>e.s!=null),['s','e'],{min:0,max:10,step:2,cls:['coral','teal'],label:'Stress and energy over time'});
+plot($('#chartSleep'),rows.filter(e=>e.h!=null),['h'],{min:0,max:12,step:3,bars:true,cls:['blue'],band:[7,9],label:'Hours of sleep per night'});
+const w=$('#weekly');w.innerHTML='';
+const cur=all.filter(e=>e.d>=daysAgo(6)),prev=all.filter(e=>e.d>=daysAgo(13)&&e.d<daysAgo(6));
+if(!cur.length){w.append(mk('p','No check ins in the last 7 days. Your summary will appear after your first one.','note'));return}
+const t=mk('table'),cap=mk('caption','Last 7 days: '+cur.length+' check in'+(cur.length>1?'s':'')+(ex?' (example)':''));t.append(cap);
+const hd=mk('tr');['','Average','Compared with the week before'].forEach(x=>{const th=mk('th',x);th.scope='col';hd.append(th)});t.append(hd);
+[['Mood (1-5)','m','',.3],['Stress (0-10)','s','',.5],['Energy (0-10)','e','',.5],['Sleep','h',' h',.5]].forEach(([n,k,u,th])=>{
+const tr=mk('tr'),h=mk('th',n);h.scope='row';tr.append(h,mk('td',fmt(avg(cur,k),u)),mk('td',trend(avg(cur,k),avg(prev,k),th)));t.append(tr)});
+w.append(t);
+const ms=all.filter(e=>e.h!=null),lo=ms.filter(e=>e.h<6),ok=ms.filter(e=>e.h>=6);
+if(lo.length>=2&&ok.length>=2){const p=mk('p','On nights under 6 hours, mood averaged '+fmt(avg(lo,'m'))+' compared with '+fmt(avg(ok,'m'))+' after 6 hours or more. This is a simple pattern in the entries, not a conclusion.','note');p.style.marginTop='.8rem';w.append(p)}
+const g=store.get('gad7',[]);if(g.length){const p=mk('p','Latest GAD-7 score: '+g[g.length-1].score+' out of 21 ('+dayLabel(g[g.length-1].d)+').','note');p.style.marginTop='.5rem';w.append(p)}}
+function setRange(n){range=n;$('#r7').setAttribute('aria-pressed',n===7);$('#r14').setAttribute('aria-pressed',n===14);drawDashboard()}
+$('#r7').onclick=()=>setRange(7);$('#r14').onclick=()=>setRange(14);
+$('#clearMoods').onclick=()=>{store.set('moods',[]);drawDashboard();drawStats();toast('Check in history cleared')};
+
+/* Reflect: tabs */
+function setTab(name){
+$$('#reflectTabs [role=tab]').forEach(b=>{const on=b.dataset.t===name;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
+$$('.rpanel').forEach(p=>{p.hidden=p.dataset.t!==name})}
+$$('#reflectTabs [role=tab]').forEach(b=>{
+b.onclick=()=>setTab(b.dataset.t);
+b.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const t=b.dataset.t==='thoughts'?'journal':'thoughts';setTab(t);$('#tab-'+t).focus()}}});
+
+/* Thought record */
+const emos=['Anxious','Sad','Angry','Guilty','Ashamed','Frustrated','Afraid','Overwhelmed','Other'];
+const dists=['Not sure','All or nothing thinking','Catastrophizing','Mind reading','Overgeneralizing','Emotional reasoning','"Should" statements','Personalization','Discounting the positive'];
+emos.forEach(x=>$('#trE').add(new Option(x,x)));dists.forEach(x=>$('#trD').add(new Option(x,x)));
+bindRange('#trI1','#vI1','/100');bindRange('#trI2','#vI2','/100');
+function drawThoughts(){const el=$('#trList'),L=store.get('thoughts',[]);el.innerHTML='';
+if(!L.length){el.append(mk('p','No records yet. Your saved records appear here, on this device only.','note'));return}
+const ul=mk('ul','','hist');
+L.slice(0,5).forEach(x=>{const li=mk('li');
+li.append(mk('p',dayLabel(x.d)+' · '+x.e+': '+x.i1+' → '+x.i2,'note'));
+li.append(mk('p','Situation: '+x.s));li.append(mk('p','Thought: '+x.t));if(x.p&&x.p!=='Not sure')li.append(mk('p','Pattern: '+x.p));li.append(mk('p','Balanced view: '+x.a));
+const b=mk('button','Delete','ghost small');b.type='button';b.onclick=()=>{store.set('thoughts',store.get('thoughts',[]).filter(y=>y.id!==x.id));drawThoughts()};li.append(b);ul.append(li)});
+el.append(ul)}
+$('#trForm').onsubmit=e=>{e.preventDefault();const msg=$('#trMsg');
+const s=$('#trS').value.trim(),t=$('#trT').value.trim(),a=$('#trA').value.trim();
+if(!s||!t||!a){msg.textContent='Fill in the situation, the thought and the balanced view before saving.';return}
+const x={id:Date.now(),d:today(),s,t,e:$('#trE').value,i1:+$('#trI1').value,p:$('#trD').value,a,i2:+$('#trI2').value};
+const L=store.get('thoughts',[]);L.unshift(x);
+if(!store.set('thoughts',L.slice(0,30))){msg.textContent='Could not save in this browser.';return}
+const diff=x.i1-x.i2;
+msg.textContent=diff>0?'Saved. The intensity went from '+x.i1+' to '+x.i2+', a drop of '+diff+' points. Feelings do not always shift right away, and this gets easier with practice.':'Saved. The intensity did not drop, and that is okay. Try asking what evidence supports and contradicts the thought, or come back to it later.';
+toast('Thought record saved');
+e.target.reset();bindRange('#trI1','#vI1','/100');bindRange('#trI2','#vI2','/100');drawThoughts()};
+
+/* Journal */
+const prompts=['What drained your energy today?','What is one thing you handled well this week?','What would you like to let go of?','Who made you feel supported recently?','What does your body need right now?','Describe a moment today when you felt calm.','What are you worried about, and what is within your control?','What are you grateful for today?'];
+let pi=new Date().getDate()%prompts.length;
+const showP=()=>{$('#prompt').textContent=prompts[pi]};showP();
+$('#newP').onclick=()=>{pi=(pi+1)%prompts.length;showP()};
+function count(){const t=$('#entry').value.trim();$('#wc').textContent=(t?t.split(/\s+/).length:0)+' words'}
+$('#entry').addEventListener('input',count);
+const j=store.get('journal',{});if(j[today()])$('#entry').value=j[today()];count();
+function drawJournal(){const all=store.get('journal',{}),ks=Object.keys(all).sort().reverse().slice(0,5),el=$('#jList');el.innerHTML='';
+if(!ks.length){el.append(mk('p','Saved entries appear here, on this device only.','note'));return}
+const ul=mk('ul','','hist');
+ks.forEach(k=>{const li=mk('li');li.append(mk('p',dayLabel(k)+'/'+k.slice(0,4),'note'));
+const t=all[k];li.append(mk('p',t.length>160?t.slice(0,160)+'…':t));
+const b=mk('button','Delete','ghost small');b.type='button';
+b.onclick=()=>{const a=store.get('journal',{});delete a[k];store.set('journal',a);if(k===today()){$('#entry').value='';count()}drawJournal()};
+li.append(b);ul.append(li)});
+el.append(ul)}
+$('#saveJ').onclick=()=>{const t=$('#entry').value.trim();const all=store.get('journal',{});
+if(!t){$('#jMsg').textContent='Write something first.';return}
+all[today()]=t;const ok=store.set('journal',all);
+$('#jMsg').textContent=ok?'Entry saved on this device.':'Could not save in this browser.';
+if(ok){toast('Entry saved');drawJournal()}};
+
+/* GAD-7 (Learn room) */
+const qs=['Feeling nervous, anxious or on edge','Not being able to stop or control worrying','Worrying too much about different things','Trouble relaxing','Being so restless that it is hard to sit still','Becoming easily annoyed or irritable','Feeling afraid, as if something awful might happen'];
+const ans=['Not at all','Several days','More than half the days','Nearly every day'];
+let qi=0,score=0;
+function band(s){
+if(s<=4)return['minimal','Your answers suggest few anxiety symptoms over the last two weeks.','Keep up the habits that help you, and use the check in to notice any change.','var(--b-teal)'];
+if(s<=9)return['mild','Your answers suggest some anxiety symptoms.','Relaxation exercises and the thought record can help. Take the questionnaire again in two weeks, and mention it to your doctor if the symptoms persist.','var(--b-blue)'];
+if(s<=14)return['moderate','Your answers suggest a level of anxiety symptoms that is often worth discussing with a professional.','A score of 10 or more is commonly used as the point to look at things further. Consider speaking with your doctor or a psychologist.','var(--b-sun)'];
+return['severe','Your answers suggest a high level of anxiety symptoms.','Please consider contacting a doctor or mental health professional soon, and lean on people you trust.','var(--b-coral)']}
+function renderQ(){const b=$('#quizBox');
+if(qi>=qs.length){const r=band(score),g=store.get('gad7',[]),prev=g.length?g[g.length-1]:null;
+g.push({d:today(),score});store.set('gad7',g.slice(-10));drawDashboard();
+b.innerHTML='<div class="stack"><h3>Your score: '+score+' out of 21 ('+r[0]+' range)</h3><div class="meter" role="img" aria-label="Score '+score+' out of 21"><i style="width:'+Math.max(4,Math.round(score/21*100))+'%;background:'+r[3]+'"></i></div><p>'+r[1]+'</p><p>'+r[2]+'</p>'+(prev?'<p class="note">Your previous score was '+prev.score+' on '+dayLabel(prev.d)+'.</p>':'')+'<p class="note">This is a screening tool for reflection only. It cannot diagnose anything and does not replace an assessment by a professional.</p><div class="row"><a class="btn" href="#calm">Open relaxation</a><button class="ghost" id="again" type="button">Take it again</button></div></div>';
+$('#again').onclick=()=>{qi=0;score=0;renderQ()};return}
+b.innerHTML='<div class="stack"><p class="note">Over the last 2 weeks, how often have you been bothered by:</p><progress max="'+qs.length+'" value="'+qi+'" aria-label="Question '+(qi+1)+' of '+qs.length+'"></progress><h3>'+qs[qi]+'</h3><div class="opts" role="radiogroup" aria-label="Answer">'+ans.map((a,i)=>'<label><input type="radio" name="q" value="'+i+'"> '+a+'</label>').join('')+'</div><div class="row"><button id="nextQ" type="button" disabled>'+(qi===qs.length-1?'See result':'Next')+'</button></div></div>';
+b.querySelectorAll('input').forEach(r=>r.onchange=()=>{$('#nextQ').disabled=false});
+$('#nextQ').onclick=()=>{score+=+b.querySelector('input:checked').value;qi++;renderQ()}}
+
+/* Learn filters */
+let cat='all',qtext='';
+function filterLearn(){let c=0;
+$$('#articles details').forEach(d=>{const ok=(cat==='all'||d.dataset.c===cat)&&d.textContent.toLowerCase().includes(qtext);d.hidden=!ok;if(ok)c++});
+$('#noArt').hidden=c>0}
+$$('#chips button').forEach(b=>b.onclick=()=>{cat=b.dataset.c;$$('#chips button').forEach(x=>x.setAttribute('aria-pressed',x===b));filterLearn()});
+$('#q').addEventListener('input',e=>{qtext=e.target.value.trim().toLowerCase();filterLearn()});
+
+/* Delete all data */
+let wipeArmed=false,wipeT;
+$('#wipe').onclick=()=>{const btn=$('#wipe');
+if(!wipeArmed){wipeArmed=true;btn.textContent='Click again to delete everything';btn.classList.remove('ghost');
+wipeT=setTimeout(()=>{wipeArmed=false;btn.textContent='Delete all my data on this device';btn.classList.add('ghost')},5000);return}
+clearTimeout(wipeT);wipeArmed=false;btn.textContent='Delete all my data on this device';btn.classList.add('ghost');
+['moods','thoughts','gad7','journal','intent'].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+$('#entry').value='';$('#intent').value='';count();drawDashboard();drawThoughts();drawJournal();drawStats();
+qi=0;score=0;renderQ();
+$('#wipeMsg').textContent='All data deleted from this device.';toast('All data deleted')};
+
+drawDashboard();drawThoughts();drawJournal();drawStats();renderQ();
+</script>
+
+</body>
+</html>
